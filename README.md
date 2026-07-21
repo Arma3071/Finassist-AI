@@ -6,7 +6,7 @@ Option 1: Local (no Docker)
 Prerequisites: Python 3.10-3.12, pip.
 
 # 1. Create venv and install deps
-cd C:\Users\navee\Downloads\finassist-ai\finassist-ai
+cd C:\Users\Downloads\finassist-ai\finassist-ai
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
