@@ -117,20 +117,21 @@ class Evaluator:
     @staticmethod
     def _precision_recall(retrieved_docs: list[str], relevant_docs: list[str]) -> tuple[float, float]:
         if not retrieved_docs and not relevant_docs:
-            return 1.0, 1.0
+            return 0.0, 0.0
         retrieved_set = set(retrieved_docs)
         relevant_set = set(relevant_docs)
-        if not retrieved_set:
+        if not retrieved_set or not relevant_set:
             return 0.0, 0.0
         true_positives = len(retrieved_set & relevant_set)
         precision = true_positives / len(retrieved_set)
-        recall = true_positives / len(relevant_set) if relevant_set else 1.0
+        recall = true_positives / len(relevant_set)
         return round(precision, 3), round(recall, 3)
 
     @staticmethod
     def _hallucination_rate(answer: str) -> float:
         """Proxy: fraction of substantive sentences lacking an inline citation."""
-        sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", answer) if len(s.strip()) > 15]
+        sentence_end = r"(?<!\b(?:Mr|Mrs|Ms|Dr|Prof|Sr|Jr|Inc|Corp|Ltd|Co|vs|etc|approx|dept|est|govt))[.!?](?:\s+|\Z)"
+        sentences = [s.strip() for s in re.split(sentence_end, answer) if len(s.strip()) > 15]
         if not sentences:
             return 0.0
         uncited = [s for s in sentences if not _CITATION_PATTERN.search(s)]

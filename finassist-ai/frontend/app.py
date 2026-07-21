@@ -156,7 +156,7 @@ def admin_tab() -> None:
     st.subheader("📊 Admin Dashboard")
 
     try:
-        metrics = requests.get(f"{BACKEND_URL}/api/metrics", timeout=15).json()
+        metrics = requests.get(f"{BACKEND_URL}/api/metrics", headers=auth_headers(), timeout=15).json()
     except requests.RequestException:
         st.warning("Backend not reachable.")
         return
@@ -194,7 +194,7 @@ def admin_tab() -> None:
 
     if st.button("Run evaluation now"):
         with st.spinner("Running golden evaluation dataset..."):
-            resp = requests.post(f"{BACKEND_URL}/api/evaluate", timeout=180)
+            resp = requests.post(f"{BACKEND_URL}/api/evaluate", headers=auth_headers(), timeout=180)
         if resp.ok:
             data = resp.json()
             st.success(f"Evaluated {data['items_evaluated']} questions.")

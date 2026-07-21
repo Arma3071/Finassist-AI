@@ -8,18 +8,12 @@ the user's question, and explicit answering instructions.
 from backend.models.schemas import Source
 
 SYSTEM_PROMPT = """You are FinAssist AI, a careful financial research assistant.
-You answer questions using ONLY the retrieved context and any tool results provided.
-If the context and tools do not contain enough information to answer confidently,
+For factual questions, use only the retrieved context and tool results provided below.
+If the provided information is insufficient to answer confidently,
 say so explicitly rather than guessing.
-Always cite the sources you used by their [S#] tag inline in your answer.
+For general conversation (greetings, introductions, etc.), respond naturally.
+Do not fabricate figures, dates, or source citations.
 Keep answers concise, precise, and professional."""
-
-INSTRUCTIONS = """Instructions:
-- Ground every factual claim in the provided context or tool results.
-- Cite sources inline using their [S#] tag, e.g. "Revenue grew 12% [S1]."
-- If multiple sources conflict, note the discrepancy.
-- If you cannot answer from the given information, say so clearly.
-- Do not fabricate figures, dates, or citations."""
 
 
 class PromptBuilder:
@@ -56,6 +50,8 @@ class PromptBuilder:
             for i, source in enumerate(sources, start=1):
                 parts.append(f"[S{i}] (from {source.document_name}, score={source.score:.2f})\n{source.text}")
             parts.append("")
+            parts.append("Cite each source you use inline with its [S#] tag, e.g. \"Revenue grew 12% [S1]\".")
+            parts.append("")
 
         if tool_results:
             parts.append("Tool results:")
@@ -63,7 +59,11 @@ class PromptBuilder:
                 parts.append(f"[{tr.get('tool_name', 'tool')}] {tr.get('result')}")
             parts.append("")
 
-        parts.append(INSTRUCTIONS)
+        parts.append("Instructions:")
+        parts.append("- Ground every factual claim in the provided context or tool results.")
+        parts.append("- If multiple sources conflict, note the discrepancy.")
+        parts.append("- If you cannot answer from the given information, say so clearly.")
+        parts.append("- Do not fabricate figures, dates, or citations.")
         parts.append("")
         parts.append(f"User question: {question}")
         parts.append("Answer:")

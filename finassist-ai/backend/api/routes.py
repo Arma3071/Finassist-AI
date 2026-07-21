@@ -118,8 +118,10 @@ async def upload_document(
 
 
 @router.delete("/documents")
-def delete_document(request: DocumentDeleteRequest) -> dict:
+def delete_document(request: DocumentDeleteRequest, authorization: str = Header(...)) -> dict:
     """Delete a document and all its chunks from the vector store."""
+    if _current_username(authorization) is None:
+        raise HTTPException(status_code=401, detail="Invalid or missing authorization token.")
     deleted = _rag_pipeline.delete_document(request.document_id)
     return {"document_id": request.document_id, "chunks_deleted": deleted}
 
@@ -176,8 +178,10 @@ def chat(request: ChatRequest, authorization: str = Header(...)) -> ChatResponse
 
 
 @router.get("/history/{session_id}")
-def get_history(session_id: str) -> dict:
+def get_history(session_id: str, authorization: str = Header(...)) -> dict:
     """Return the stored conversation history for a session."""
+    if _current_username(authorization) is None:
+        raise HTTPException(status_code=401, detail="Invalid or missing authorization token.")
     return {"session_id": session_id, "history": db.get_chat_history(session_id)}
 
 
@@ -185,8 +189,10 @@ def get_history(session_id: str) -> dict:
 # Evaluation
 # --------------------------------------------------------------------- #
 @router.post("/evaluate", response_model=EvaluationRunResponse)
-def run_evaluation() -> EvaluationRunResponse:
+def run_evaluation(authorization: str = Header(...)) -> EvaluationRunResponse:
     """Run the golden evaluation dataset through the agent and score the results."""
+    if _current_username(authorization) is None:
+        raise HTTPException(status_code=401, detail="Invalid or missing authorization token.")
     results = _evaluator.evaluate_dataset(_agent, EVAL_DATASET)
 
     summaries = [
@@ -221,8 +227,10 @@ def run_evaluation() -> EvaluationRunResponse:
 # Metrics / Admin dashboard
 # --------------------------------------------------------------------- #
 @router.get("/metrics", response_model=MetricsResponse)
-def get_metrics() -> MetricsResponse:
+def get_metrics(authorization: str = Header(...)) -> MetricsResponse:
     """Return aggregated metrics for the admin dashboard."""
+    if _current_username(authorization) is None:
+        raise HTTPException(status_code=401, detail="Invalid or missing authorization token.")
     query_stats = db.get_query_stats()
     eval_stats = db.get_evaluation_stats()
 

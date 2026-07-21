@@ -21,7 +21,7 @@ from backend.agent.langchain_tools import build_langchain_tools
 from backend.agent.state import AgentState
 from backend.config import Settings
 from backend.llm.client import LLMClient
-from backend.mcp.tools.registry import TOOLS_BY_NAME
+from backend.mcp.tools.registry import get_tools_by_name
 from backend.models.schemas import ChatResponse, ToolCall
 from backend.rag.pipeline import RAGPipeline
 from backend.rag.prompt import PromptBuilder
@@ -115,7 +115,7 @@ class FinAssistAgent:
         tool_results: list[dict] = []
 
         for call in getattr(response, "tool_calls", []) or []:
-            tool = TOOLS_BY_NAME.get(call["name"])
+            tool = get_tools_by_name().get(call["name"])
             if tool is None:
                 logger.warning("Model requested unknown tool: %s", call["name"])
                 continue
