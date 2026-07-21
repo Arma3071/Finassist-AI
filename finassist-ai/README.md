@@ -5,8 +5,6 @@ Generation (RAG), the Model Context Protocol (MCP), LLM integration,
 vector databases, an autonomous agent, and an evaluation pipeline — built
 end-to-end with FastAPI, LangChain/LangGraph, ChromaDB, and Streamlit.
 
-![Chat screenshot](docs/screenshots/chat.png)
-
 ## Features
 
 - 🔐 **Auth** — register/login, password hashing, session tokens, persistent chat history (SQLite).
